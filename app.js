@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+var http = require('http');
+
 var app = express();
 
 // view engine setup
@@ -56,16 +58,17 @@ app.use(function(err, req, res, next) {
   });
 });
 
+app.set('port', process.env.PORT || 3000);
 
 module.exports = app;
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
+// this rewrites all urls that aren't files (i.e. don't have a dot in them)
+// to index.html to make deep linking work
+app.get('^[^.]+$', function(req, res) {
+  res.sendfile('src/index.html');
 });
 
-var server = app.listen(3000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
 
-  console.log(' app listening at http://%s:%s', host, port);
+http.createServer(app).listen(app.get('port'), function(){
+  console.log("Express server listening on port " + app.get('port'));
 });
